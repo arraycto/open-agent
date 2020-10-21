@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <springProperty scope="context" name="appName" source="spring.application.name"/>
+    <springProperty scope="context" name="kafkaBootstrap" source="kafka-bootstrap-servers"/>
+    <springProperty scope="context" name="kafkaLogTopic" source="kafka-log-topic"/>
+    <property resource="logback.properties"/>
+    <!--配置规则类的位置-->
+    <conversionRule conversionWord="ip" converterClass="com.opencloud.agent.util.IPLogConfig"/>
+    <property name="CONSOLE_LOG_PATTERN"
+              value="[%d{yyyy-MM-dd HH:mm:ss.SSS} %contextName %ip ${log.server} %X{userId:-} %highlight(%-5level) %yellow(%X{X-B3-TraceId}),%green(%X{X-B3-SpanId}),%blue(%X{X-B3-ParentSpanId}) %yellow(%thread) %green(%logger) %msg%n"/>
+    <!-- 控制台输出 -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 按照每天生成日志文件 -->
+    <appender name="LogFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${log.path.prod}/${log.name}.log</File>
+        <Append>true</Append>
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <!--            我日，就是这里，搞死我了-->
+            <level>DEBUG</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>${log.path.prod}/${log.name}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>${log.size}</maxFileSize>
+            <maxHistory>${log.history}</maxHistory>
+            <totalSizeCap>${log.total.size}</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="ErrorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${log.path.prod}/${log.name.error}.log</File>
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>${log.path.prod}/${log.name.error}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>${log.size}</maxFileSize>
+            <maxHistory>${log.history}</maxHistory>
+            <totalSizeCap>${log.total.size}</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+    <!--输出到kafka-->
+    <!-- This example configuration is probably most unreliable under
+     failure conditions but wont block your application at all -->
+    <!--    <appender name="fast-kafka-appender" class="com.github.danielwegener.logback.kafka.KafkaAppender">-->
+    <!--        &lt;!&ndash;        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">&ndash;&gt;-->
+    <!--        &lt;!&ndash;            <pattern>${CONSOLE_LOG_PATTERN}</pattern>&ndash;&gt;-->
+    <!--        &lt;!&ndash;        </encoder>&ndash;&gt;-->
+    <!--        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">-->
+    <!--            <providers>-->
+    <!--                <timestamp>-->
+    <!--                    <timeZone>UTC+8</timeZone>-->
+    <!--                </timestamp>-->
+    <!--                <pattern>-->
+    <!--                    <pattern>-->
+    <!--                        {-->
+    <!--                        "ip": "%ip",-->
+    <!--                        "app": "${appName}",-->
+    <!--                        "level": "%level",-->
+    <!--                        "userId": "%X{userId:-}",-->
+    <!--                        "trace": "%X{X-B3-TraceId:-}",-->
+    <!--                        "span": "%X{X-B3-SpanId:-}",-->
+    <!--                        "parent": "%X{X-B3-ParentSpanId:-}",-->
+    <!--                        "thread": "%thread",-->
+    <!--                        "class": "%logger{40}",-->
+    <!--                        "message": "%message",-->
+    <!--                        "stack_trace": "%exception{10}"-->
+    <!--                        }-->
+    <!--                    </pattern>-->
+    <!--                </pattern>-->
+    <!--            </providers>-->
+    <!--        </encoder>-->
+    <!--        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->
+    <!--            <level>INFO</level>-->
+    <!--        </filter>-->
+    <!--        <topic>${kafkaLogTopic}</topic>-->
+    <!--        &lt;!&ndash; ensure that every message sent by the executing host is partitioned to the same partition strategy &ndash;&gt;-->
+    <!--        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.HostNameKeyingStrategy"/>-->
+
+    <!--        &lt;!&ndash; use async delivery. the application threads are not blocked by logging &ndash;&gt;-->
+    <!--        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy"/>-->
+
+    <!--        &lt;!&ndash; each <producerConfig> translates to regular kafka-client config (format: key=value) &ndash;&gt;-->
+    <!--        &lt;!&ndash; producer configs are documented here: https://kafka.apache.org/documentation.html#newproducerconfigs &ndash;&gt;-->
+    <!--        &lt;!&ndash; bootstrap.servers is the only mandatory producerConfig 10.107.1.43:9092,10.107.1.74:9092,10.107.1.108:9092&ndash;&gt;-->
+    <!--        <producerConfig>bootstrap.servers=${kafkaBootstrap}</producerConfig>-->
+    <!--        &lt;!&ndash; don't wait for a broker to ack the reception of a batch.  &ndash;&gt;-->
+    <!--        <producerConfig>acks=0</producerConfig>-->
+    <!--        &lt;!&ndash; wait up to 1000ms and collect log messages before sending them as a batch &ndash;&gt;-->
+    <!--        <producerConfig>linger.ms=1000</producerConfig>-->
+    <!--        &lt;!&ndash; even if the producer buffer runs full, do not block the application but start to drop messages &ndash;&gt;-->
+    <!--        <producerConfig>max.block.ms=0</producerConfig>-->
+    <!--        &lt;!&ndash; define a client-id that you use to identify yourself against the kafka broker &ndash;&gt;-->
+    <!--        <producerConfig>client.id=${HOSTNAME}-${CONTEXT_NAME}-logback-relaxed</producerConfig>-->
+    <!--        <producerConfig>security.protocol=SASL_PLAINTEXT</producerConfig>-->
+    <!--        <producerConfig>sasl.mechanism=PLAIN</producerConfig>-->
+
+    <!--        &lt;!&ndash; there is no fallback <appender-ref>. If this appender cannot deliver, it will drop its messages. &ndash;&gt;-->
+    <!--    </appender>-->
+    <logger name="com.alibaba.nacos" level="OFF">
+
+    </logger>
+    <logger name="com.alibaba.nacos.client.config.http.ServerHttpAgent" level="OFF">
+
+    </logger>
+    <logger name="com.alibaba.nacos.client.config.impl.ClientWorker" level="OFF">
+
+    </logger>
+    <root level="INFO">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="LogFile"/>
+        <appender-ref ref="ErrorFile"/>
+        <!--        <appender-ref ref="fast-kafka-appender"/>-->
+    </root>
+
+</configuration>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common/common_header::common_header(~{::title})">
+    <title>zdora</title>
+</head>
+<style type="text/css">
+    .layui-form-checkbox[lay-skin=primary] {
+        min-height: 28px;
+    }
+
+    body .layer_bg .layui-layer-content {
+        background-color: #393D49;
+    }
+</style>
+<body style="background-color: #F2F2F2;font-family: Consolas;">
+
+<div style="margin: 20px;">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>
+                    <button class="layui-btn layui-btn-primary" style="border: none">节点机器<span class="layui-badge"
+                                                                                               th:text="${clientsCount}"></span>
+                    </button>
+                </legend>
+            </fieldset>
+        </div>
+        <div class="layui-card-body">
+            <div class="layui-form layui-form-pane" th:each="client,clientStat:${clients}">
+                <div class="layui-form-item" name="executor" style="width: 100%;height: 100%;margin-bottom: 20px">
+                    <label class="layui-form-label" style="width: 20%" th:text="${client.cid}"></label>
+                    <div class="layui-inline" style="width: 25%;margin-bottom: 0px">
+                        <input class="layui-input" name="executeCommand" placeholder="请输入命令,如java" type="text">
+                    </div>
+                    <div class="layui-inline" style="width: 35%;margin-bottom: 0px">
+                        <input class="layui-input" name="executeArgs" placeholder="请输入参数,如-version" type="text">
+                    </div>
+                    <input name="cid" th:value="${client.cid}" type="hidden">
+                    <input name="sessionId" th:value="${client.session.id}" type="hidden">
+                    <div class="layui-inline" style="margin-bottom: 0px;">
+                        <button class="layui-btn layui-btn-primary" th:onclick="'showMore(this)'">更多选项..</button>
+                    </div>
+                    <div class="layui-inline" style="margin-bottom: 0px;float: right;margin-right: 0px">
+                        <button class="layui-btn layui-btn-primary" th:onclick="'executor(this)'">执行</button>
+                    </div>
+                </div>
+                <div class="layui-form-item" show="0" style="display: none;background-color: #F2F2F2">
+                    <div class="layui-card" style="background-color: #F2F2F2;margin-bottom: 0px;box-shadow: none">
+                        <div class="layui-card-body" style="padding-bottom: 0px">
+                            <div class="layui-form-item" pane="">
+                                <label class="layui-form-label">传递执行ID</label>
+                                <div class="layui-input-block">
+                                    <input lay-filter="switchExecutorId" lay-skin="switch" lay-text="是|否"
+                                           name="isExecutorId"
+                                           type="checkbox" value="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-card" style="background-color: #F2F2F2;margin-bottom: 0px;box-shadow: none">
+                        <div class="layui-card-body" style="padding-top: 0px;padding-bottom: 0px">
+                            <fieldset class="layui-elem-field site-demo-button" style="margin-top: 0px;padding: 1px">
+                                <legend>执行命令前</legend>
+                                <div style="width: 100%">
+                                    <div class="layui-form-item">
+                                        <div class="layui-inline" style="width: 48%;margin-right: 0px">
+                                            <label class="layui-form-label" style="width: 35%">从server端拷贝</label>
+                                            <div class="layui-input-inline" style="width: 63%">
+                                                <input class="layui-input" name="beforeFromServerPath" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="layui-inline" style="width: 48%">
+                                            <label class="layui-form-label" style="width: 35%"
+                                                   th:text="至+${client.cid}"></label>
+                                            <div class="layui-input-inline" style="width: 63%">
+                                                <input class="layui-input" name="beforeToClientPath" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <div class="layui-inline" style="width: 48%;margin-right: 0px">
+                                            <label class="layui-form-label" style="width: 35%"
+                                                   th:text="从+${client.cid}+拷贝"></label>
+                                            <div class="layui-input-inline" style="width: 63%">
+                                                <input class="layui-input" name="beforeFromClientPath" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="layui-inline" style="width: 48%">
+                                            <label class="layui-form-label" style="width: 35%">至server端</label>
+                                            <div class="layui-input-inline" style="width: 63%">
+                                                <input class="layui-input" name="beforeToServerPath" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div class="layui-card" style="background-color: #F2F2F2;margin-bottom: 0px;box-shadow: none">
+                        <div class="layui-card-body" style="padding-top: 0px;">
+                            <fieldset class="layui-elem-field site-demo-button" style="margin-top: 0px;">
+                                <legend>执行命令后</legend>
+                                <div style="width: 100%">
+                                    <div class="layui-form-item">
+                                        <div class="layui-inline" style="width: 48%;margin-right: 0px">
+                                            <label class="layui-form-label" style="width: 35%">从server端拷贝</label>
+                                            <div class="layui-input-inline" style="width: 63%">
+                                                <input class="layui-input" name="afterFromServerPath" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="layui-inline" style="width: 48%">
+                                            <label class="layui-form-label" style="width: 35%"
+                                                   th:text="至+${client.cid}"></label>
+                                            <div class="layui-input-inline" style="width: 63%">
+                                                <input class="layui-input" name="afterToClientPath" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <div class="layui-inline" style="width: 48%;margin-right: 0px">
+                                            <label class="layui-form-label" style="width: 35%"
+                                                   th:text="从+${client.cid}+拷贝"></label>
+                                            <div class="layui-input-inline" style="width: 63%">
+                                                <input class="layui-input" name="afterFromClientPath" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="layui-inline" style="width: 48%">
+                                            <label class="layui-form-label" style="width: 35%">至server端</label>
+                                            <div class="layui-input-inline" style="width: 63%">
+                                                <input class="layui-input" name="afterToServerPath" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>
+                    <button class="layui-btn layui-btn-primary" style="border: none">服务端工作区</button>
+                </legend>
+            </fieldset>
+        </div>
+        <div class="layui-card-body">
+            <div class="layui-collapse" lay-filter="workspace">
+                <div class="layui-colla-item">
+                    <h2 class="layui-colla-title">
+                        workspace
+                    </h2>
+                    <div class="layui-colla-content" id="workspaceContent">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>
+                    <button class="layui-btn layui-btn-primary" style="border: none">执行详情</button>
+                </legend>
+            </fieldset>
+        </div>
+        <div class="layui-card-body">
+            <div class="layui-collapse" id="executorDetails" lay-filter="executor">
+                <div class="layui-colla-item" name="executorLogs" th:each="executor,executorsStat:${executors}">
+                    <h2 class="layui-colla-title layui-inline" style="width: 92%"
+                        th:text="${executor.cid}+ ':' +${executor.executeCommand}+' '+${executor.executeArgs}+ ' 执行ID:'+${executor.executeId}+' '+${executor.status.statusName}">
+                        <span th:id="'status_'+${executor.executeId}"></span>
+                    </h2>
+                    <input name="executeId" th:value="${executor.executeId}" type="hidden">
+                    <a class="layui-icon layui-icon-upload-drag layui-inline"
+                       th:onclick="'reExecutor('+${executor.executeId}+')'"></a>
+                    <div class="layui-colla-content" name="logs" th:attr="id='logs_'+${executor.executeId}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script th:inline="javascript" type="text/javascript">
+
+    layui.use('form', function () {
+        var form = layui.form;
+        form.render();
+        form.on('switch(switchExecutorId)', function (data) {
+            if (this.checked) {
+                $(this).val("1");
+            } else {
+                $(this).val("0");
+            }
+        });
+    });
+
+    layui.use(['element', 'layer'], function () {
+        var element = layui.element;
+        //监听折叠
+        element.on('collapse(executor)', function (data) {
+            var executeId = $(this).next("input[name='executeId']").eq(0).val();
+            if (data.show) {
+                socket.send(JSON.stringify({type: 8, executeId: executeId}));
+            } else {
+                $("#lWebSocketogs_" + executeId).empty();
+                socket.send(JSON.stringify({type: 9, executeId: executeId}));
+            }
+        });
+
+        element.on('collapse(workspace)', function (data) {
+            if (data.show) {
+                $.post(ctx + "/workspace/files", {}, function (data) {
+                    $.each(data, function (i, n) {
+                        if (n.type == 'dir') {
+                            $("#workspaceContent").append("<p>" + n.fn + "</p>");
+                        } else if (n.type == 'file') {
+                            $("#workspaceContent").append("<p><a href='" + ctx + "/server/" + n.fn + "' target='_blank'>" + n.fn + "</a></p>");
+                        }
+                    });
+                });
+            } else {
+                $("#workspaceContent").empty();
+            }
+        });
+    });
+
+    var cid = [[${cid}]];
+    var browserSessionId = "-1";
+
+    function showMore(obj) {
+        var p = $(obj).parent().eq(0).parent().eq(0);
+        var f = $(p).next(".layui-form-item").eq(0);
+        if ($(f).attr("show") == '0') {
+            $(f).show();
+            $(f).attr("show", '1');
+            $(p).css("margin-bottom", "0px");
+        } else {
+            $(f).hide();
+            $(f).attr("show", '0');
+            $(p).css("margin-bottom", "20px");
+        }
+    }
+
+    function executor(obj) {
+        var f = $(obj).parent().eq(0).parent().eq(0).parent().eq(0);
+        var params = {};
+        $(f).find("input[name]").each(function (i) {
+            params[$(this).attr("name")] = $(this).val();
+        });
+        params["browserSessionId"] = browserSessionId;
+        $.post(ctx + "/push", params, function (data) {
+            if (data.retCode == '200') {
+                layer.alert('执行ID:' + data.data.executeId, {
+                    skin: 'layui-layer-molv' //样式类名
+                    , closeBtn: 0
+                });
+                $("#executorDetails").prepend("<div class=\"layui-colla-item\" name=\"executorLogs\">" +
+                    "                    <h2 class=\"layui-colla-title layui-inline\" style=\"width: 92%\">" + data.data.cid + ":" + data.data.executeCommand + " " + data.data.executeArgs + " 执行ID:" + data.data.executeId + " " +
+                    "                    <span id='status_" + data.data.executeId + "'>" + data.data.status.statusName + "</span>" +
+                    "                    </h2>" +
+                    "                    <input name=\"executeId\" type=\"hidden\" value=\"" + data.data.executeId + "\">" +
+                    "                    <a class=\"layui-icon layui-icon-upload-drag layui-inline\" onclick='reExecutor(" + data.data.executeId + ")'></a>" +
+                    "                    <div class=\"layui-colla-content\" id=\"logs_" + data.data.executeId + "\" name=\"logs\"></div>" +
+                    "                </div>");
+                layui.element.render('collapse', 'executor');
+            } else {
+                layer.alert('执行出错,请重新执行', {
+                    skin: 'layui-layer-molv' //样式类名
+                    , closeBtn: 0
+                });
+            }
+        });
+    }
+
+    function reExecutor(executorId) {
+        $.post(ctx + "/executorFromBrower", {executeId: executorId}, function (data) {
+            if (data) {
+                var executor = $("input[name='cid']").eq(0).parent().eq(0);
+                $(executor).find("*[name='executeCommand']").eq(0).val(data.executeCommand);
+                $(executor).find("*[name='executeArgs']").eq(0).val(data.executeArgs);
+                var moreSet = $(executor).next("div").eq(0);
+                var switchObj = $(moreSet).find("*[name='isExecutorId']").eq(0);
+                //$(switchObj).val(data.isExecutorId);
+                if (data.isExecutorId == 1) {
+                    $(switchObj).prop("checked", "checked");
+                } else {
+                    $(switchObj).prop("checked", "");
+                }
+                layui.form.render("checkbox");
+                $(moreSet).find("*[name='beforeFromServerPath']").eq(0).val(data.beforeFromServerPath);
+                $(moreSet).find("*[name='beforeToClientPath']").eq(0).val(data.beforeToClientPath);
+                $(moreSet).find("*[name='beforeFromClientPath']").eq(0).val(data.beforeFromClientPath);
+                $(moreSet).find("*[name='beforeToServerPath']").eq(0).val(data.beforeToServerPath);
+                $(moreSet).find("*[name='afterFromServerPath']").eq(0).val(data.afterFromServerPath);
+                $(moreSet).find("*[name='afterToClientPath']").eq(0).val(data.afterToClientPath);
+                $(moreSet).find("*[name='afterFromClientPath']").eq(0).val(data.afterFromClientPath);
+                $(moreSet).find("*[name='afterToServerPath']").eq(0).val(data.afterToServerPath);
+                console.log(data);
+            }
+        });
+    }
+
+    var socket;
+    if (typeof (WebSocket) == "undefined") {
+        console.log("您的浏览器不支持WebSocket");
+    } else {
+        console.log("您的浏览器支持WebSocket");
+        //实现化WebSocket对象，指定要连接的服务器地址与端口 建立连接
+        // 等同于socket = new WebSocket("ws://localhost:8083/checkcentersys/websocket/20");
+        socket = new WebSocket((ctx + "/websocket/" + cid + "/4").replace("http", "ws"));
+        //打开事件
+        socket.onopen = function () {
+            socket.send(JSON.stringify({type: 10}));
+        };
+        //获得消息事件
+        socket.onmessage = function (msg) {
+            var message = JSON.parse(msg.data);
+            if (message.type === 2) {
+                var ei = message.executeId;
+                $("#logs_" + ei).append("<p>" + message.message + "</p>");
+                if (message.executeStatus === 2) {//执行完成
+                    $("#status_" + ei).text("执行完成");
+                }
+            } else if (message.type === 6) {
+                browserSessionId = message.message;
+            }
+        };
+        //关闭事件
+        socket.onclose = function () {
+            console.log("Socket已关闭");
+        };
+        //发生了错误事件
+        socket.onerror = function () {
+            //alert("Socket发生了错误");
+            //此时可以尝试刷新页面
+        }
+    }
+
+    $(function () {
+
+    });
+
+</script>
+</html>
+

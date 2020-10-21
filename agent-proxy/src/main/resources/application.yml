@@ -1,0 +1,110 @@
+# Tomcat
+server:
+  tomcat:
+    uri-encoding: UTF-8
+    threads:
+      max: 1000
+      min-spare: 30
+    connection-timeout: 5000ms
+  port: 8080
+  servlet:
+    context-path: /v1/proxy
+spring:
+  application:
+    name: opencloud-proxy
+    # jackson时间格式化
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+      enabled: true
+  mvc:
+    throw-exception-if-no-handler-found: true
+  #  resources:
+  #    add-mappings: false
+  #thymelea模板配置
+  thymeleaf:
+    mode: HTML
+    servlet:
+      content-type: text/html
+    encoding: UTF-8
+    cache: false
+  redis:
+    open: true
+    database: 0
+    host: 10.10.40.40
+    port: 6379
+    password: admin@110
+    timeout: 6000ms
+    jedis:
+      pool:
+        max-active: 1000
+        max-wait: -1ms
+        max-idle: 10
+        min-idle: 5
+  # Druid
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/db_plat?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      username: root
+      password: admin
+      initial-size: 10
+      max-active: 100
+      min-idle: 10
+      max-wait: 60000
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      #Oracle需要打开注释
+      #validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        login-username: admin
+        login-password: admin
+      filter:
+        stat:
+          log-slow-sql: true
+          slow-sql-millis: 1000
+          merge-sql: false
+        wall:
+          config:
+            multi-statement-allow: true
+  cloud:
+    server-addr: 10.10.41.40:8087
+    namespace: 99f68f46-2c60-4ecb-a59c-5f27a6a304d5
+    nacos:
+      discovery:
+        server-addr: ${spring.cloud.server-addr}
+        namespace: ${spring.cloud.namespace}
+# Logback
+logging:
+  config: classpath:conf/logback-dev.xml
+  level:
+    org:
+      springframework: INFO
+      apache:
+        kafka: ERROR
+    com:
+      ibatis: DEBUG
+      sensetime:
+        cloud: DEBUG
+      # alibaba:
+      #   nacos: ERROR
+      alicp:
+        jetcache: ERROR
+
+workspace:
+  dir: /Users/xielianjun
+local:
+  fileserver:
+    path: server
