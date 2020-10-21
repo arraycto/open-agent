@@ -4,8 +4,10 @@
 [![codecov](https://codecov.io/gh/zhoutaoo/SpringCloud/branch/master/graph/badge.svg)](https://codecov.io/gh/zhoutaoo/SpringCloud)
 
 ## 快速开始
+```text
 功能：自动化运维服务，自己写的玩的，没有在生产部署、无测试数据
 RPC：[参考](https://github.com/luxiaoxun/NettyRpc)
+```
 ### 先决条件
 
 首先本机先要安装以下环境。
