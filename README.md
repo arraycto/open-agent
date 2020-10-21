@@ -48,16 +48,16 @@ linux和mac下可在项目根目录下执行 `./install.sh` 快速搭建开发�
 * 3.案例示意图
 
 <p align="left">
-  <img width="600" src="https://github.com/767248371/open-agent/blob/master/picture/cmd_1.png">
+  <img src="https://github.com/767248371/open-agent/blob/master/picture/cmd_1.png">
 </p>
 <p align="left">
-  <img width="600" src="https://github.com/767248371/open-agent/blob/master/picture/cmd_2.png">
+  <img  src="https://github.com/767248371/open-agent/blob/master/picture/cmd_2.png">
 </p>
 <p align="left">
-  <img width="600" src="https://github.com/767248371/open-agent/blob/master/picture/日志.png">
+  <img src="https://github.com/767248371/open-agent/blob/master/picture/日志.png">
 </p>
 <p align="left">
-  <img width="600" src="https://github.com/767248371/open-agent/blob/master/picture/详情.png">
+  <img  src="https://github.com/767248371/open-agent/blob/master/picture/详情.png">
 </p>
 * 6.前端项目
 vue写的
